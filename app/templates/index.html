@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Tour - Khám phá Việt Nam</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; font-family: Arial, sans-serif; color: #243047; background: #f4f7fb; }
+        header { background: #123c69; color: white; padding: 22px 7%; }
+        header h1 { margin: 0; }
+        header p { margin-bottom: 0; }
+        .hero { padding: 55px 7%; color: white; background: linear-gradient(120deg, #087e8b, #123c69); }
+        .hero h2 { font-size: 34px; margin: 0 0 12px; }
+        main { max-width: 1150px; margin: 35px auto; padding: 0 20px; }
+        .tours { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 22px; }
+        .tour { background: white; border-radius: 12px; padding: 22px; box-shadow: 0 4px 15px #152b4b12; }
+        .tour h3 { margin-top: 0; color: #123c69; }
+        .location { color: #087e8b; font-weight: bold; }
+        .price { font-size: 22px; font-weight: bold; color: #d35400; }
+        form { border-top: 1px solid #e5eaf1; margin-top: 18px; padding-top: 16px; }
+        label { display: block; margin: 10px 0 5px; font-size: 14px; }
+        input { width: 100%; padding: 10px; border: 1px solid #ccd5e0; border-radius: 6px; }
+        button { width: 100%; margin-top: 14px; padding: 12px; border: 0; border-radius: 6px; color: white; background: #087e8b; font-weight: bold; cursor: pointer; }
+        button:hover { background: #066570; }
+        .message { padding: 13px; margin-bottom: 20px; border-radius: 6px; background: #e0f5e9; }
+        .error { background: #fde8e7; }
+        footer { text-align: center; padding: 25px; background: #123c69; color: white; margin-top: 50px; }
+    </style>
+</head>
+<body>
+<header>
+    <h1>Booking Tour</h1>
+    <p>Khám phá Việt Nam theo cách của bạn</p>
+</header>
+
+<section class="hero">
+    <h2>Hành trình đáng nhớ bắt đầu từ đây</h2>
+    <p>Lựa chọn điểm đến yêu thích và gửi yêu cầu đặt tour trực tuyến.</p>
+</section>
+
+<main>
+    <h2>Tour du lịch nổi bật</h2>
+
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="message {{ 'error' if category == 'error' else '' }}">{{ message }}</div>
+    {% endfor %}
+
+    <section class="tours">
+        {% for tour in tours %}
+        <article class="tour">
+            <h3>{{ tour.name }}</h3>
+            <p class="location">📍 {{ tour.location }}</p>
+            <p>{{ tour.description }}</p>
+            <p>Thời lượng: {{ tour.days }}</p>
+            <p class="price">{{ "{:,.0f}".format(tour.price) }} VNĐ/người</p>
+
+            <form action="{{ url_for('book', tour_id=tour.id) }}" method="post">
+                <label for="name-{{ tour.id }}">Họ và tên</label>
+                <input id="name-{{ tour.id }}" name="customer_name" required maxlength="100">
+
+                <label for="email-{{ tour.id }}">Email</label>
+                <input id="email-{{ tour.id }}" name="email" type="email" required maxlength="150">
+
+                <label for="guests-{{ tour.id }}">Số khách (1–20)</label>
+                <input id="guests-{{ tour.id }}" name="guests" type="number" min="1" max="20" value="1" required>
+
+                <button type="submit">Đặt tour</button>
+            </form>
+        </article>
+        {% endfor %}
+    </section>
+</main>
+
+<footer>
+    <p>Booking Tour / Du lịch — Dự án thực hành triển khai và giám sát hệ thống</p>
+</footer>
+</body>
+</html>

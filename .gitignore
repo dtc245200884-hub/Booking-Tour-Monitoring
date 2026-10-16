@@ -2,3 +2,9 @@
 *.db
 *.sqlite*
 __pycache__/
+
+.env
+*.db
+__pycache__/
+*.pyc
+*.backup

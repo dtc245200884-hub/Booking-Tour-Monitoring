@@ -53,6 +53,22 @@ services:
     networks:
       - monitoring
 
+
+  booking-app:
+    build:
+      context: ./app
+    container_name: booking-app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      DB_PATH: /data/bookings.db
+      SECRET_KEY: ${BOOKING_SECRET_KEY:-change-this-secret}
+    volumes:
+      - booking_data:/data
+    networks:
+      - monitoring
+
 networks:
   monitoring:
     driver: bridge
@@ -60,4 +76,4 @@ networks:
 volumes:
   prometheus_data:
   grafana_data:
- 
+  booking_data:
