@@ -12,6 +12,7 @@
 + Tài khoản : admin
 + Mật khẩu : admin
 - Node Exporter: http://localhost:9100/metrics
+- Website Booking Tour:	http://localhost:5000
 
 ## Khởi chạy
 docker compose up -d
