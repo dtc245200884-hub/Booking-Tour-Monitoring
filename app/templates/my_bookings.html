@@ -1,0 +1,109 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tour đã đặt | Wanderly</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, sans-serif;
+            background: #f3f8f6;
+            color: #173b36;
+        }
+        main { max-width: 900px; margin: 20px auto; }
+        header { margin-bottom: 28px; }
+        a { color: #167d69; text-decoration: none; }
+        .booking {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 16px;
+            padding: 22px;
+            border-radius: 14px;
+            background: white;
+            box-shadow: 0 5px 20px #173b360c;
+        }
+        .booking img {
+            width: 150px;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+        .info { flex: 1; }
+        h1 { margin-bottom: 8px; }
+        h2 { margin-top: 0; }
+        .muted { color: #657773; line-height: 1.7; }
+        .empty {
+            padding: 35px;
+            border-radius: 14px;
+            background: white;
+            text-align: center;
+        }
+        .btn {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 11px 16px;
+            border-radius: 8px;
+            background: #167d69;
+            color: white;
+        }
+        @media (max-width: 560px) {
+            .booking { align-items: flex-start; flex-direction: column; }
+            .booking img { width: 100%; height: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <header>
+            <a href="{{ url_for('index') }}">← Trở về Wanderly</a>
+            <h1>Tour đã đặt</h1>
+            <p class="muted">Theo dõi những yêu cầu đặt tour của bạn.</p>
+        </header>
+
+        {% if bookings %}
+            {% for booking in bookings %}
+                <article class="booking">
+                    {% if booking.tour %}
+                        <img src="{{ booking.tour.image }}"
+                             alt="{{ booking.tour.name }}" loading="lazy">
+                    {% endif %}
+                    <div class="info">
+                        <h2>
+                            {% if booking.tour %}
+                                {{ booking.tour.name }}
+                            {% else %}
+                                Tour #{{ booking.tour_id }}
+                            {% endif %}
+                        </h2>
+                        <p class="muted">
+                            Người đặt: {{ booking.customer_name }}<br>
+                            Email: {{ booking.email }}<br>
+                            Số khách: {{ booking.guests }}<br>
+                            Ngày tạo yêu cầu: {{ booking.created_at }}
+                        </p>
+                        {% if booking.tour %}
+                            <a href="{{ url_for('tour_detail', tour_id=booking.tour_id) }}">
+                                Xem chi tiết tour
+                            </a>
+                        {% endif %}
+                    </div>
+                </article>
+            {% endfor %}
+        {% else %}
+            <section class="empty">
+                <h2>Bạn chưa đặt tour nào</h2>
+                <p class="muted">Hãy chọn một điểm đến để bắt đầu hành trình.</p>
+                <a class="btn" href="{{ url_for('index') }}#tours">
+                    Khám phá các tour
+                </a>
+            </section>
+        {% endif %}
+    </main>
+</body>
+</html>
+```

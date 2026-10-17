@@ -8,3 +8,7 @@ __pycache__/
 __pycache__/
 *.pyc
 *.backup
+.venv/
+*.bak
+*.backup*
+*.bak.*

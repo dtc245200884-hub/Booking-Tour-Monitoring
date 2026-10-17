@@ -1,0 +1,125 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản trị | Wanderly</title>
+    <style>
+        body{font-family:Arial,sans-serif;margin:0;background:#f4f7f8;color:#243746}
+        header{background:#153d45;color:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center}
+        main{max-width:1100px;margin:30px auto;padding:0 16px}
+        .stats{display:flex;gap:16px;flex-wrap:wrap}
+        .card{background:white;padding:20px;border-radius:12px;margin-bottom:20px;box-shadow:0 2px 12px #0000000a}
+        .stats .card{flex:1;min-width:180px}
+        h1{font-size:24px}h2{font-size:19px}
+        .number{font-size:30px;font-weight:bold;color:#087f75}
+        .table-wrap{overflow-x:auto}
+        table{width:100%;border-collapse:collapse;background:white}
+        th,td{text-align:left;padding:12px;border-bottom:1px solid #e6ecee;white-space:nowrap}
+        th{background:#edf4f4}
+        a{color:inherit}
+        .logout{background:white;color:#153d45;padding:9px 13px;border:0;border-radius:7px;cursor:pointer}
+        .message{padding:12px;background:#fff1d6;border-radius:8px;margin-bottom:15px}
+    </style>
+</head>
+<body>
+<header>
+    <div><strong>Wanderly · Quản trị</strong></div>
+    <div>
+        Xin chào, {{ session.get('user_name', 'Admin') }}
+        <form action="{{ url_for('logout') }}" method="post" style="display:inline">
+            <button class="logout" type="submit">Đăng xuất</button>
+        </form>
+    </div>
+</header>
+<main>
+    {% for category, message in get_flashed_messages(with_categories=true) %}
+        <div class="message">{{ message }}</div>
+    {% endfor %}
+
+    <h1>Bảng điều khiển Admin</h1>
+    <div class="stats">
+        <div class="card"><div>Tổng tài khoản</div><div class="number">{{ users|length }}</div></div>
+        <div class="card"><div>Tổng đơn đặt tour</div><div class="number">{{ bookings|length }}</div></div>
+        <div class="card"><div>Tổng tour</div><div class="number">{{ tours|length }}</div></div>
+    </div>
+
+    <section class="card">
+        <h2>Danh sách tài khoản</h2>
+        <div class="table-wrap">
+            <table>
+                <thead>
+    <tr>
+        <th>ID</th>
+        <th>Họ tên</th>
+        <th>Email</th>
+        <th>Quyền</th>
+        <th>Ngày tạo</th>
+        <th>Thao tác</th>
+    </tr>
+</thead>
+                <tbody>
+                {% for user in users %}
+                    <tr>
+                        <td>{{ user.id }}</td>
+<td>{{ user.name }}</td>
+<td>{{ user.email }}</td>
+<td>{{ user.role }}</td>
+<td>{{ user.created_at }}</td>
+<td>
+    {% if user.id != session.get('user_id') %}
+    <form method="post"
+          action="{{ url_for('change_user_role', user_id=user.id) }}">
+        <select name="role">
+            <option value="user"
+                {% if user.role == 'user' %}selected{% endif %}>
+                User
+            </option>
+            <option value="admin"
+                {% if user.role == 'admin' %}selected{% endif %}>
+                Admin
+            </option>
+        </select>
+        <button type="submit">Cập nhật quyền</button>
+    </form>
+    {% else %}
+        Tài khoản hiện tại
+    {% endif %}
+</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6">Chưa có tài khoản.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+
+    <section class="card">
+        <h2>Tất cả đơn đặt tour</h2>
+        <div class="table-wrap">
+            <table>
+                <thead><tr><th>Mã đơn</th><th>Khách hàng</th><th>Email</th><th>Tour</th><th>Số khách</th><th>Ngày đặt</th><th>Tài khoản</th></tr></thead>
+                <tbody>
+                {% for booking in bookings %}
+                    <tr>
+                        <td>{{ booking.id }}</td>
+                        <td>{{ booking.customer_name }}</td>
+                        <td>{{ booking.email }}</td>
+                        <td>{{ booking.tour.name if booking.tour else 'Tour không tồn tại' }}</td>
+                        <td>{{ booking.guests }}</td>
+                        <td>{{ booking.created_at }}</td>
+                        <td>{{ booking.account_name or 'Khách cũ' }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7">Chưa có đơn đặt tour.</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    <p><a href="{{ url_for('index') }}">← Trở về trang chủ</a></p>
+</main>
+</body>
+</html>

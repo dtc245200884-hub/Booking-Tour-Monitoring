@@ -85,10 +85,24 @@
 <body>
 <header class="topbar">
   <a class="brand" href="#" aria-label="Wanderly trang chủ"><span class="brand-mark">W</span> wanderly<span style="color:var(--teal)">.</span></a>
-  <nav class="nav" aria-label="Điều hướng chính">
-    <a href="#tours">Khám phá</a><a href="#why">Về chúng tôi</a><a href="#booking">Đặt tour</a>
-    <a class="nav-cta" href="#booking">Lên kế hoạch ↗</a>
-  </nav>
+
+<nav class="nav" aria-label="Điều hướng chính">
+    <a href="#tours">Khám phá</a>
+    <a href="#why">Về chúng tôi</a>
+    <a href="#booking">Đặt tour</a>
+
+    {% if logged_in_user %}
+      <a href="{{ url_for('my_bookings') }}">Lịch sử đặt tour</a>
+      <span>Xin chào, {{ logged_in_user }}</span>
+      <form action="{{ url_for('logout') }}" method="post" style="display:inline">
+        <button type="submit" class="nav-cta">Đăng xuất</button>
+      </form>
+    {% else %}
+      <a href="{{ url_for('login') }}">Đăng nhập</a>
+      <a href="{{ url_for('register') }}">Đăng ký</a>
+    {% endif %}
+</nav>
+
 </header>
 
 <section class="hero">
@@ -121,19 +135,20 @@
     </div>
     <div class="tour-grid">
       {% for tour in tours %}
-      <article class="tour" data-location="{{ tour.location }}">
+      <article class="tour" data-location="{{ tour.location }}"
+         onclick="window.location.href='{{ url_for('tour_detail', tour_id=tour.id) }}'"
+         style="cursor:pointer">
         <div class="tour-image">
-          {% if tour.id == 1 %}
-          <img src="https://images.unsplash.com/photo-1559592413-7cec4d0cae2b?auto=format&fit=crop&w=1000&q=85" alt="Cầu Vàng và cảnh núi tại Đà Nẵng" loading="lazy">
-          <span class="tag">✦ Được yêu thích</span>
-          {% elif tour.id == 2 %}
-          <img src="https://images.unsplash.com/photo-1570168007204-dfb528c6958f?auto=format&fit=crop&w=1000&q=85" alt="Phong cảnh xanh mát tại Đà Lạt" loading="lazy">
-          <span class="tag">☁ Nghỉ dưỡng</span>
-          {% else %}
-          <img src="https://images.unsplash.com/photo-1518509562904-e7ef99cdcc86?auto=format&fit=crop&w=1000&q=85" alt="Biển xanh và bờ cát nhiệt đới" loading="lazy">
-          <span class="tag">☀ Biển xanh</span>
-          {% endif %}
-        </div>
+  <img src="{{ tour.image }}" alt="{{ tour.name }}">
+
+  {% if tour.id == 1 %}
+    <span class="tag">✦ Được yêu thích</span>
+  {% elif tour.id == 2 %}
+    <span class="tag">☁ Nghỉ dưỡng</span>
+  {% else %}
+    <span class="tag">☀ Khám phá</span>
+  {% endif %}
+</div>
         <div class="tour-body">
           <div class="place">⌖ {{ tour.location }}</div>
           <h3>{{ tour.name }}</h3>

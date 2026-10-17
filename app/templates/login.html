@@ -1,0 +1,85 @@
+```html
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập | Wanderly</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #f1f7f5;
+            color: #173b36;
+        }
+        .card {
+            width: 100%;
+            max-width: 420px;
+            padding: 32px;
+            border-radius: 18px;
+            background: white;
+            box-shadow: 0 10px 35px #173b3615;
+        }
+        h1 { margin-top: 0; }
+        p { color: #657773; line-height: 1.6; }
+        label { display: block; margin: 18px 0 8px; font-weight: bold; }
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #d5e2de;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            margin-top: 24px;
+            padding: 13px;
+            border: 0;
+            border-radius: 8px;
+            background: #167d69;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        a { color: #167d69; }
+        .message { margin: 12px 0; color: #b42318; }
+        .back { display: block; margin-top: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <main class="card">
+        <h1>Chào mừng trở lại!</h1>
+        <p>Đăng nhập tài khoản để tiếp tục hành trình cùng Wanderly.</p>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% for category, message in messages %}
+                <div class="message">{{ message }}</div>
+            {% endfor %}
+        {% endwith %}
+
+        <form method="post">
+            <label for="email">Email</label>
+            <input id="email" name="email" type="email"
+                   autocomplete="email" required>
+
+            <label for="password">Mật khẩu</label>
+            <input id="password" name="password" type="password"
+                   autocomplete="current-password" required>
+
+            <button type="submit">Đăng nhập</button>
+        </form>
+
+        <p>Chưa có tài khoản?
+            <a href="{{ url_for('register') }}">Đăng ký ngay</a>
+        </p>
+        <a class="back" href="{{ url_for('index') }}">← Trở về trang chủ</a>
+    </main>
+</body>
+</html>
+```
