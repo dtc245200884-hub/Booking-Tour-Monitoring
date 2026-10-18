@@ -40,6 +40,18 @@
     .field input,.field select{width:100%;height:47px;border:1px solid var(--line);border-radius:11px;padding:0 13px;background:#fbfcfc;color:var(--ink);font:inherit;outline:none}
     .field input:focus,.field select:focus{border-color:var(--teal);box-shadow:0 0 0 3px #0d94881b}
     .searchbar .btn{height:47px;padding:0 24px;white-space:nowrap}
+    .searchbar{grid-template-columns:repeat(3,minmax(0,1fr));align-items:end}
+    .search-actions{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+    .search-actions .btn{height:47px}
+    .reset-search{border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);padding:13px 18px;font:600 13px "DM Sans",sans-serif;cursor:pointer}
+    .reset-search:hover{border-color:var(--teal);color:var(--teal)}
+    .search-hint{grid-column:1/-1;color:var(--muted);font-size:12px;line-height:1.5;margin:0}
+    .results-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin:-8px 0 22px;color:var(--muted);font-size:14px}
+    .results-toolbar strong{color:var(--ink)}
+    .no-results{grid-column:1/-1;background:#fff;border:1px dashed #cbd5dc;border-radius:18px;padding:32px;text-align:center;color:var(--muted)}
+    @media(max-width:900px){.searchbar{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.searchbar{grid-template-columns:1fr}.search-hint{grid-column:auto}.search-actions{display:grid;grid-template-columns:1fr}.results-toolbar{align-items:flex-start;flex-direction:column}}
+
     main{max-width:1200px;margin:0 auto;padding:76px 24px 85px}
     .section-head{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:28px}
     .section-kicker{font-size:11px;text-transform:uppercase;letter-spacing:2px;font-weight:800;color:var(--teal);margin-bottom:10px}
@@ -116,14 +128,54 @@
 </section>
 
 <div class="search-wrap">
-  <form class="searchbar" action="#tours" method="get">
-    <div class="field"><label for="destination">Bạn muốn đi đâu?</label><select id="destination" name="destination"><option value="">Tất cả điểm đến</option><option value="Đà Nẵng">Đà Nẵng</option><option value="Đà Lạt">Đà Lạt</option><option value="Phú Quốc">Phú Quốc</option></select></div>
-    <div class="field"><label for="travel-style">Phong cách chuyến đi</label><select id="travel-style" name="style"><option>Thiên nhiên & khám phá</option><option>Nghỉ dưỡng</option><option>Ẩm thực & văn hóa</option></select></div>
-    <div class="field"><label for="travel-time">Thời điểm dự kiến</label><input id="travel-time" type="text" placeholder="Ví dụ: Tháng 12"></div>
-    <button class="btn" type="submit">Tìm hành trình →</button>
+  <form class="searchbar" id="tour-search" action="#tours" method="get">
+    <div class="field">
+      <label for="destination">Điểm đến</label>
+      <input id="destination" name="destination" list="destination-options"
+             placeholder="Tìm tỉnh/thành phố..." autocomplete="off">
+      <datalist id="destination-options">
+        {% for tour in tours %}
+        <option value="{{ tour.location }}">
+        {% endfor %}
+      </datalist>
+    </div>
+   
+    <div class="field">
+      <label for="travel-date">Ngày dự kiến khởi hành</label>
+      <input id="travel-date" name="date" type="date">
+    </div>
+    <div class="field">
+      <label for="duration-filter">Thời lượng</label>
+      <select id="duration-filter" name="duration">
+        <option value="">Mọi thời lượng</option>
+        <option value="2">2 ngày 1 đêm</option>
+        <option value="3">3 ngày 2 đêm</option>
+        <option value="4">4 ngày 3 đêm</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="budget-filter">Ngân sách tối đa/người</label>
+      <select id="budget-filter" name="budget">
+        <option value="">Không giới hạn</option>
+        <option value="2000000">2 triệu đồng</option>
+        <option value="2500000">2,5 triệu đồng</option>
+        <option value="3000000">3 triệu đồng</option>
+        <option value="4000000">4 triệu đồng</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="region-filter">Khu vực</label>
+      <select id="region-filter" name="region">
+        <option value="">Tất cả khu vực</option>
+        <option value="north">Miền Bắc</option>
+        <option value="central">Miền Trung</option>
+        <option value="south">Miền Nam</option>
+      </select>
+    </div>
+
+    <p class="search-hint">Ngày khởi hành là ngày bạn dự kiến đi; website chưa xác nhận lịch khởi hành hoặc chỗ trống.</p>
   </form>
 </div>
-
 <main>
   {% for category, message in get_flashed_messages(with_categories=true) %}
     <div class="message {{ 'error' if category == 'error' else '' }}">{{ message }}</div>
@@ -133,9 +185,19 @@
       <div><div class="section-kicker">Được yêu thích nhất</div><h2>Những chuyến đi đáng nhớ</h2><p>Chọn một nơi bạn muốn khám phá tiếp theo.</p></div>
       <a href="#booking" style="color:var(--teal);font-weight:800;font-size:14px">Tìm chuyến đi của bạn ↗</a>
     </div>
-    <div class="tour-grid">
+    <div class="results-toolbar">
+      <span id="results-count" aria-live="polite">Đang hiển thị các hành trình</span>
+      <span>Giá hiển thị tính theo mỗi người</span>
+    </div>
+    <div class="tour-grid" id="tour-grid">
       {% for tour in tours %}
-      <article class="tour" data-location="{{ tour.location }}"
+      <article class="tour"
+         data-location="{{ tour.location }}"
+         data-name="{{ tour.name }}"
+         data-description="{{ tour.description }}"
+         data-price="{{ tour.price }}"
+         data-days="{{ tour.days }}"
+         data-order="{{ loop.index0 }}"
          onclick="window.location.href='{{ url_for('tour_detail', tour_id=tour.id) }}'"
          style="cursor:pointer">
         <div class="tour-image">
@@ -193,14 +255,112 @@
   <p>© 2026 Wanderly · Dự án Booking Tour Monitoring</p>
 </footer>
 <script>
+  const searchForm = document.getElementById('tour-search');
   const destination = document.getElementById('destination');
-  destination.addEventListener('change', () => {
-    const selected = destination.value.trim().toLocaleLowerCase('vi');
-    document.querySelectorAll('.tour').forEach(card => {
-      const location = (card.dataset.location || '').trim().toLocaleLowerCase('vi');
-      card.style.display = !selected || location.includes(selected) ? '' : 'none';
+  const dateFilter = document.getElementById('travel-date');
+  const durationFilter = document.getElementById('duration-filter');
+  const budgetFilter = document.getElementById('budget-filter');
+  const regionFilter = document.getElementById('region-filter');
+  const tourGrid = document.getElementById('tour-grid');
+  const resultCount = document.getElementById('results-count');
+  const tourCards = Array.from(tourGrid.querySelectorAll('.tour'));
+
+  const regionByLocation = {
+    'Hà Nội': 'north', 'Hạ Long': 'north', 'Sa Pa': 'north',
+    'Ninh Bình': 'north', 'Hà Giang': 'north', 'Cao Bằng': 'north',
+    'Mộc Châu': 'north',
+    'Đà Nẵng': 'central', 'Hội An': 'central', 'Huế': 'central',
+    'Phong Nha': 'central', 'Quy Nhơn': 'central', 'Nha Trang': 'central',
+    'Đà Lạt': 'central', 'Mũi Né': 'south',
+    'TP. Hồ Chí Minh': 'south', 'Cần Thơ': 'south',
+    'Bến Tre': 'south', 'Phú Quốc': 'south', 'Côn Đảo': 'south'
+  };
+
+  function normalized(value) {
+    return (value || '').trim().toLocaleLowerCase('vi');
+  }
+
+
+  function durationDays(card) {
+    const match = (card.dataset.days || '').match(/(\d+)\s*ngày/);
+    return match ? Number(match[1]) : 0;
+  }
+
+  function applyTourFilters() {
+    const query = normalized(destination.value);
+    const maxBudget = budgetFilter.value ? Number(budgetFilter.value) : Infinity;
+    const maxDays = durationFilter.value ? Number(durationFilter.value) : Infinity;
+    const region = regionFilter.value;
+
+    let visibleCards = tourCards.filter(card => {
+      const location = normalized(card.dataset.location);
+      const name = normalized(card.dataset.name);
+      const description = normalized(card.dataset.description);
+      const price = Number(card.dataset.price || 0);
+      const matchesDestination = !query || location.includes(query) || name.includes(query);
+      const matchesBudget = price <= maxBudget;
+      const matchesDuration = durationDays(card) <= maxDays;
+      const matchesRegion = !region || regionByLocation[card.dataset.location] === region;
+      return matchesDestination && matchesBudget && matchesDuration &&
+             matchesRegion &&
+             (!query || description.includes(query) || location.includes(query) || name.includes(query));
     });
+
+    tourCards.forEach(card => { card.hidden = true; });
+    visibleCards.forEach(card => {
+      card.hidden = false;
+      tourGrid.appendChild(card);
+    });
+
+    let empty = document.getElementById('no-tour-results');
+    if (!visibleCards.length) {
+      if (!empty) {
+        empty = document.createElement('div');
+        empty.id = 'no-tour-results';
+        empty.className = 'no-results';
+        empty.textContent = 'Chưa tìm thấy tour phù hợp. Hãy thử nới rộng ngân sách hoặc thay đổi bộ lọc.';
+        tourGrid.appendChild(empty);
+      }
+      empty.hidden = false;
+    } else if (empty) {
+      empty.hidden = true;
+    }
+
+    resultCount.innerHTML = 'Tìm thấy <strong>' + visibleCards.length +
+      '</strong> / ' + tourCards.length + ' hành trình phù hợp';
+
+    const params = new URLSearchParams();
+    if (destination.value.trim()) params.set('destination', destination.value.trim());
+    if (dateFilter.value) params.set('date', dateFilter.value);
+    if (durationFilter.value) params.set('duration', durationFilter.value);
+    if (budgetFilter.value) params.set('budget', budgetFilter.value);
+    if (region) params.set('region', region);
+    const queryString = params.toString();
+    history.replaceState(null, '', window.location.pathname + (queryString ? '?' + queryString : '') + window.location.hash);
+  }
+
+  searchForm.addEventListener('submit', event => {
+    event.preventDefault();
+    applyTourFilters();
+    document.getElementById('tours').scrollIntoView({ behavior: 'smooth' });
   });
+
+  [destination, dateFilter, durationFilter, budgetFilter, regionFilter]
+    .forEach(control => control.addEventListener('change', applyTourFilters));
+  destination.addEventListener('input', applyTourFilters);
+
+  document.getElementById('reset-search').addEventListener('click', () => {
+    searchForm.reset();
+    applyTourFilters();
+  });
+
+  // Restore filters from the URL when the page is opened or refreshed.
+  const params = new URLSearchParams(window.location.search);
+  ['destination', 'date', 'duration', 'budget', 'region'].forEach(key => {
+    const control = searchForm.elements.namedItem(key);
+    if (control && params.has(key)) control.value = params.get(key);
+  });
+  applyTourFilters();
   const tourSelect = document.getElementById('tour-select');
   const bookingForm = document.getElementById('booking-form');
   function updateBookingAction() {
