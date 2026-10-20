@@ -15,8 +15,8 @@
 - Website Booking Tour:	http://localhost:5000
 
 ## Khởi chạy
-cd ~/booking-tour-monitoring
-docker compose up -d
+-cd ~/booking-tour-monitoring
+-docker compose up -d
 
 ## Kiểm tra
 docker compose ps
