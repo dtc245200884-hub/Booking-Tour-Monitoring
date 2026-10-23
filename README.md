@@ -19,3 +19,43 @@ docker compose up -d
 
 ## Kiểm tra
 docker compose ps
+## Cấu trúc thư mục dự án
+Đường dẫn trên Ubuntu Server của bạn:
+
+/root/booking-tour-monitoring
+booking-tour-monitoring/
+
+README.md
+
+Giới thiệu dự án và hướng dẫn sử dụng
+
+
+docker-compose.yml
+
+Khai báo và kết nối 4 container
+
+
+app/
+
+Ứng dụng Booking Tour viết bằng Python Flask
+
+app.py · Dockerfile · requirements.txt
+
+templates/ · static/
+
+
+prometheus/
+
+Cấu hình thu thập metrics
+
+prometheus.yml
+
+
+grafana/
+
+Cấu hình nguồn dữ liệu giám sát
+
+provisioning/datasources/prometheus.yml
+
+
+.gitignore
