@@ -55,6 +55,22 @@ grafana/
 
 Cấu hình nguồn dữ liệu giám sát
 
+booking-tour-monitoring/
+├── app/
+│   ├── app.py
+│   ├── Dockerfile
+│   ├── requirements.txt
+│   ├── templates/
+│   └── static/
+├── prometheus/
+│   └── prometheus.yml
+├── grafana/
+│   └── provisioning/
+│       └── datasources/
+├── docker-compose.yml
+├── README.md
+└── .gitignore
+
 provisioning/datasources/prometheus.yml
 
 
